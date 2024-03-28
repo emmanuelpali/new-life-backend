@@ -85,7 +85,7 @@ router.put('/:id', async (req, res, next) => {
   try {
     const { collection } = await extractdb()
     const id = req.params.id
-    const secondChanceItem = await collection.findOne({ id: id})
+    const secondChanceItem = await collection.findOne({ id: id })
     if (!secondChanceItem) {
       logger.error('secondChanceItem not found')
       return res.status(404).json({ error: 'Item not found' })
