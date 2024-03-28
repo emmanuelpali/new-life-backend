@@ -1,7 +1,5 @@
 const express = require('express')
 const multer = require('multer')
-const path = require('path')
-const fs = require('fs')
 const router = express.Router()
 const connectToDatabase = require('../models/db')
 const logger = require('../logger')
@@ -16,12 +14,12 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname) // Use the original file name
-  },
+  }
 })
 
 const upload = multer({ storage: storage })
 
-async function extractdb() {
+const extractdb = async () => {
   const db = await connectToDatabase()
   const collection = db.collection('secondChanceItems')
   return { db, collection }
@@ -44,7 +42,7 @@ router.get('/', async (req, res, next) => {
 router.post('/', upload.single('file'), async (req, res, next) => {
   try {
     const { collection } = await extractdb()
-    const secondChanceItem = req.body
+    let secondChanceItem = req.body
     if (
       !secondChanceItem.category ||
       !secondChanceItem.condition ||
@@ -58,8 +56,8 @@ router.post('/', upload.single('file'), async (req, res, next) => {
     await lastItemQuery.forEach((item) => {
       secondChanceItem.id = (parseInt(item.id) + 1).toString()
     })
-    const date_added = Math.floor(new Date().getTime() / 1000)
-    secondChanceItem.date_added = date_added
+    const dateAdded = Math.floor(new Date().getTime() / 1000)
+    secondChanceItem.date_dded = dateAdded
     secondChanceItem = await collection.insertOne(secondChanceItem)
     res.status(201).json(secondChanceItem.ops[0])
   } catch (e) {
@@ -86,7 +84,8 @@ router.get('/:id', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const { collection } = await extractdb()
-    const secondChanceItem = await collection.findOne({ id: req.params.id })
+    const id = req.params.id
+    const secondChanceItem = await collection.findOne({ id: id})
     if (!secondChanceItem) {
       logger.error('secondChanceItem not found')
       return res.status(404).json({ error: 'Item not found' })
@@ -96,13 +95,13 @@ router.put('/:id', async (req, res, next) => {
     secondChanceItem.age_days = req.body.age_days
     secondChanceItem.description = req.body.description
     secondChanceItem.age_years = Number(
-      (secondChanceItem.age_days / 365).toFixed(1),
+      (secondChanceItem.age_days / 365).toFixed(1)
     )
     secondChanceItem.updatedAt = new Date()
     const updateItem = await collection.findOneAndUpdate(
       { id },
       { $set: secondChanceItem },
-      { returnDocument: 'after' },
+      { returnDocument: 'after' }
     )
     if (!updateItem) {
       logger.error('secondChanceItem not found')

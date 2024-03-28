@@ -35,13 +35,13 @@ router.post('/register', async (req, res, next) => {
       password: hashedPassword,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      createdAt: new Date(),
+      createdAt: new Date()
     })
 
     const payload = {
       user: {
-        id: newUser.insertedId,
-      },
+        id: newUser.insertedId
+      }
     }
 
     const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' })
@@ -62,7 +62,7 @@ router.post('/login', async (req, res, next) => {
     if (user) {
       let passwordMatch = await bcryptjs.compare(
         req.body.password,
-        user.password,
+        user.password
       )
       if (!passwordMatch) {
         logger.error('Invalid credentials')
@@ -71,8 +71,8 @@ router.post('/login', async (req, res, next) => {
       //fetch the user details
       let payload = {
         user: {
-          id: user._id.toString(),
-        },
+          id: user._id.toString()
+        }
       }
 
       const userName = user.firstName
@@ -128,14 +128,14 @@ router.put('/update', async (req, res, next) => {
     const updatedUser = await collection.findOneAndUpdate(
       { email },
       { $set: existingUser },
-      { returnDocument: 'after' },
+      { returnDocument: 'after' }
     )
 
     // create jwt token with user._id as payload using secret key from .env file
     const payload = {
       user: {
-        id: updatedUser._id.toString(),
-      },
+        id: updatedUser._id.toString()
+      }
     }
 
     const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' })
