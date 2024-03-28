@@ -20,8 +20,7 @@ app.post('/sentiment', async (req, res) => {
 
   if (!sentence) {
     logger.error('No sentence provided')
-    return res.status(400)
-    .json({ error: 'No sentence provided' })
+    return res.status(400).json({ error: 'No sentence provided' })
   }
 
   // Initialize the sentiment analyzer with the Natural's PorterStemmer and "English" language
